@@ -42,7 +42,7 @@ label.leftToSuperview()
 **AutoLayoutWoot:**
 ```swift
 let label = UILabel()
-label.layout(in: view)
+label.layout(addingTo: view)
     .top()
     .left()
 ```
@@ -85,7 +85,7 @@ box.height(100)
 **AutoLayoutWoot:**
 ```swift
 let box = UIView()
-box.layout(in: view)
+box.layout(addingTo: view)
     .center()
     .width(100)
     .height(100)
@@ -123,7 +123,7 @@ container.edgesToSuperview()
 **AutoLayoutWoot:**
 ```swift
 let container = UIView()
-container.layout(in: view)
+container.layout(addingTo: view)
     .edges()
 ```
 
@@ -159,7 +159,7 @@ box.edgesToSuperview(insets: .uniform(20))
 **AutoLayoutWoot:**
 ```swift
 let box = UIView()
-box.layout(in: view)
+box.layout(addingTo: view)
     .edges(inset: 20)
 ```
 
@@ -195,9 +195,10 @@ label.topToBottom(of: button, offset: 8)
 **AutoLayoutWoot:**
 ```swift
 let label = UILabel()
-label.layout(in: view)
-    .left(to: button)
-    .top(to: button.bottom, offset: 8)
+label.layout(addingTo: view)
+    .layout(relativeTo: button)
+    .left()
+    .topToBottom(offset: 8)
 ```
 
 ### Fixed Size, Centered
@@ -236,7 +237,7 @@ button.height(44)
 **AutoLayoutWoot:**
 ```swift
 let button = UIButton()
-button.layout(in: view)
+button.layout(addingTo: view)
     .center()
     .size(width: 200, height: 44)
 ```
@@ -248,15 +249,39 @@ button.layout(in: view)
 Instead of repeating "toSuperview" or passing view references constantly, AutoLayoutWoot establishes the layout context upfront:
 
 ```swift
-view.layout(in: superview)  // Context established
-    .left()                 // Relative to superview
-    .top()                  // Also relative to superview
+view.layout(addingTo: superview)  // Context established, view added
+    .left()                       // Relative to superview
+    .top()                        // Also relative to superview
 ```
 
 This handles three things automatically:
 - Sets `translatesAutoresizingMaskIntoConstraints = false`
 - Calls `superview.addSubview(view)`
 - Establishes what constraints are relative to
+
+AutoLayoutWoot provides multiple layout methods for different scenarios:
+
+```swift
+// Initial setup: adds as subview and configures
+view.layout(addingTo: parent)
+    .top()
+    .left()
+
+// Already in hierarchy: relative to superview
+view.layoutInSuperview()
+    .bottom()
+    .right()
+
+// Relative to a sibling or other view
+label.layout(relativeTo: button)
+    .left()
+    .topToBottom(offset: 8)
+
+// Self-relative constraints (size, aspect ratio)
+view.layout()
+    .width(100)
+    .height(100)
+```
 
 ### 2. No Namespace Pollution
 
@@ -350,7 +375,7 @@ box.bottomToSuperview()
 
 **2. UIView namespace pollution.** TinyConstraints extends UIView directly with layout methods, which means your autocomplete shows `left()`, `right()`, `center()`, `width()`, etc. intermingled with all of UIView's existing methods and properties. This clutters autocomplete and makes it harder to find what you're looking for.
 
-AutoLayoutWoot solves both by establishing context once (`.layout(in: view)`) and keeping all layout methods in a dedicated namespace.
+AutoLayoutWoot solves both by establishing context once (`.layout(addingTo: view)` or `.layoutInSuperview()`) and keeping all layout methods in a dedicated namespace.
 
 ## Installation
 
