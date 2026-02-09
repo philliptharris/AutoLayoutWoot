@@ -17,8 +17,8 @@ Here's how you position a label in the top-left corner:
 let label = UILabel()
 label.translatesAutoresizingMaskIntoConstraints = false
 view.addSubview(label)
-label.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
 label.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+label.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
 ```
 
 **SnapKit:**
@@ -26,8 +26,8 @@ label.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
 let label = UILabel()
 view.addSubview(label)
 label.snp.makeConstraints { make in
-    make.left.equalTo(view)
     make.top.equalTo(view)
+    make.left.equalTo(view)
 }
 ```
 
@@ -35,16 +35,16 @@ label.snp.makeConstraints { make in
 ```swift
 let label = UILabel()
 view.addSubview(label)
-label.leftToSuperview()
 label.topToSuperview()
+label.leftToSuperview()
 ```
 
 **AutoLayoutWoot:**
 ```swift
 let label = UILabel()
 label.layout(in: view)
-    .left()
     .top()
+    .left()
 ```
 
 ## More Examples
