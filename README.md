@@ -377,6 +377,216 @@ box.bottomToSuperview()
 
 AutoLayoutWoot solves both by establishing context once (`.layout(addingTo: view)` or `.layoutInSuperview()`) and keeping all layout methods in a dedicated namespace.
 
+## API Reference
+
+### Layout Context Methods
+
+#### `layout(addingTo:)` - Initial Setup
+Adds the view as a subview, sets `translatesAutoresizingMaskIntoConstraints = false`, and returns a layout context.
+
+```swift
+label.layout(addingTo: view)
+    .top()
+    .left()
+```
+
+#### `layoutInSuperview()` - Existing Subview
+Returns a layout context for a view already in the hierarchy. Constraints are relative to the superview.
+
+```swift
+// Assumes label is already added to superview
+label.layoutInSuperview()
+    .bottom()
+    .right()
+```
+
+#### `layout(relativeTo:)` - Sibling or Other View
+Returns a layout context with constraints relative to another view.
+
+```swift
+label.layout(relativeTo: button)
+    .left()
+    .topToBottom(offset: 8)
+```
+
+#### `layout()` - Self-Relative
+Returns a layout context for self-relative constraints (size, aspect ratio).
+
+```swift
+view.layout()
+    .width(100)
+    .height(100)
+```
+
+### Edge Constraints
+
+#### Basic Positioning
+```swift
+.top()           // Equal to reference view's top
+.left()          // Equal to reference view's left
+.bottom()        // Equal to reference view's bottom
+.right()         // Equal to reference view's right
+.leading()       // Equal to reference view's leading (respects RTL)
+.trailing()      // Equal to reference view's trailing (respects RTL)
+```
+
+#### With Offset
+```swift
+.top(offset: 20)        // 20 points from top
+.left(offset: 10)       // 10 points from left
+.bottom(offset: -20)    // 20 points from bottom (negative insets from bottom/right)
+```
+
+#### With Priority
+```swift
+.top(priority: .high)
+.left(offset: 10, priority: .defaultLow)
+```
+
+#### With Relation
+```swift
+.top(atLeast: 20)              // greaterThanOrEqual with offset
+.left(atMost: 100)             // lessThanOrEqual with offset
+.bottom(atLeast: 0, priority: .high)
+```
+
+#### Relative to Safe Area
+```swift
+.topToSafeArea()
+.bottomToSafeArea(offset: -20)
+.leftToSafeArea()
+.rightToSafeArea()
+```
+
+#### Relative to Layout Margins
+```swift
+.topToMargin()
+.leftToMargin()
+.bottomToMargin(offset: -10)
+.rightToMargin()
+```
+
+### Size Constraints
+
+#### Fixed Size
+```swift
+.width(100)
+.height(200)
+.size(width: 100, height: 100)
+.size(100)  // Same width and height
+```
+
+#### With Relation
+```swift
+.width(atLeast: 100)
+.height(atMost: 500)
+```
+
+#### Relative to Another View
+```swift
+.width(equalTo: otherView)
+.height(equalTo: otherView)
+.width(equalTo: otherView, multiplier: 0.5)
+.height(equalTo: otherView, multiplier: 2.0, offset: -20)
+```
+
+#### Aspect Ratio
+```swift
+.aspectRatio(16.0/9.0)
+```
+
+### Composite Constraints
+
+#### All Edges
+```swift
+.edges()                    // Pin to all edges
+.edges(inset: 20)          // Inset from all edges by 20
+.edges(insets: UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20))
+```
+
+#### Edges to Safe Area
+```swift
+.edgesToSafeArea()
+.edgesToSafeArea(inset: 20)
+```
+
+#### Edges to Margins
+```swift
+.edgesToMargins()
+.edgesToMargins(inset: 10)
+```
+
+#### Centering
+```swift
+.center()              // Center both X and Y
+.centerX()             // Center horizontally
+.centerY()             // Center vertically
+.centerX(offset: 10)   // Center with offset
+.centerY(offset: -20)
+```
+
+### Relative Positioning
+
+When using `.layout(relativeTo:)`, you get specialized methods for positioning relative to another view:
+
+#### Edge to Edge
+```swift
+.left()         // Align left edges
+.right()        // Align right edges
+.top()          // Align top edges
+.bottom()       // Align bottom edges
+```
+
+#### Edge to Opposite Edge
+```swift
+.leftToRight(offset: 8)      // Position to the right of reference
+.rightToLeft(offset: -8)     // Position to the left of reference
+.topToBottom(offset: 8)      // Position below reference
+.bottomToTop(offset: -8)     // Position above reference
+```
+
+### Advanced Features
+
+#### Inactive Constraints
+By default, all constraints are active. To create an inactive constraint:
+
+```swift
+let constraint = view.layout(addingTo: parent)
+    .top(active: false)
+
+// Later, activate it:
+constraint.isActive = true
+```
+
+#### Accessing Created Constraints
+To get references to constraints for later modification:
+
+```swift
+let constraints = view.layout(addingTo: parent)
+    .top()
+    .left()
+    .constraints  // Returns [NSLayoutConstraint]
+```
+
+#### Multiplier with Offset
+For proportional sizing with adjustment:
+
+```swift
+// Width is 50% of parent minus 20 points
+.width(equalTo: parent, multiplier: 0.5, offset: -20)
+```
+
+#### Complex Example
+```swift
+let box = UIView()
+box.layout(addingTo: view)
+    .topToSafeArea(offset: 20)
+    .leftToMargin()
+    .rightToMargin()
+    .height(atLeast: 100, priority: .high)
+    .height(200, priority: .defaultLow)  // Preferred height, can compress
+```
+
 ## Installation
 
 ### Swift Package Manager
